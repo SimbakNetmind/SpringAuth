@@ -1,5 +1,6 @@
 package com.r2system.security.app.SpringBootSecurityApp.config.security;
 
+import com.r2system.security.app.SpringBootSecurityApp.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.http.HttpMethod;
@@ -26,28 +27,14 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private DataSource dataSource;
+    private UserDetailsServiceImpl service;
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        //Autenticacion Virtual
-//        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//        UserBuilder users = User.builder().passwordEncoder(encoder::encode);
-//
-//
-//        auth.inMemoryAuthentication()
-//                .withUser(users.username("simbak").password("123123").roles("ADMIN"))
-//                .withUser(users.username("juan").password("123123").roles("MEMBER"));
-
-
-        //Conexion JDBC
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(bCryptPasswordEncoder)
-                .usersByUsernameQuery("select username, password, enabled from users where username=?")
-                .authoritiesByUsernameQuery("select u.username, a.authority from authorities a inner join users u on (a.user_id=u.id) where u.username=?");
-
+              auth.userDetailsService(service)
+                      .passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
